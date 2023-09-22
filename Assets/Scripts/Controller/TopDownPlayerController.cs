@@ -34,4 +34,16 @@ public class TopDownPlayerController : TopDownCharacterController
     {
 
     }
+    private void OnOpenPlayerStatusUI(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            if (UIManager.Instance.IsOpenedUI(UIType.PlayerStatus))
+            {
+                UIManager.Instance.CloseUI(UIType.PlayerStatus);
+                return;
+            }
+            UIManager.Instance.OpenUI(UIType.PlayerStatus);
+        }
+    }
 }

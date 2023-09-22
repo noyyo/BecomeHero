@@ -25,4 +25,9 @@ public class UIInventory : UIBase
     {
         gameObject.SetActive(false);
     }
+
+    public override void InitializeUI()
+    {
+        throw new System.NotImplementedException();
+    }
 }

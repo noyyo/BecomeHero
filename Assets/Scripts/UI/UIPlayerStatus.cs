@@ -21,17 +21,7 @@ public class UIPlayerStatus : UIBase
 
     private PlayerStatHandler _playerStatHandler;
     
-
-    private void Awake()
-    {
-        InitializeUI();
-    }
-    private void Start()
-    {
-        _playerStatHandler = GameManager.Instance.Player.GetComponent<PlayerStatHandler>();
-        UpdateUI();
-    }
-    private void InitializeUI()
+    public override void InitializeUI()
     {
         // !! Watch out index number !!
         _nameText = _playerInfo.GetChild(1).GetComponent<TextMeshProUGUI>();
@@ -48,6 +38,7 @@ public class UIPlayerStatus : UIBase
         {
             _uiStats.Add(stat.StatType, stat);
         }
+        _playerStatHandler = GameManager.Instance.Player.GetComponent<PlayerStatHandler>();
 
     }
     public override void CloseUI()

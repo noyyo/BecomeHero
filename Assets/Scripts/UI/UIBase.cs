@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class UIBase: MonoBehaviour
 {
+    public abstract void InitializeUI();
     public abstract void UpdateUI();
     public abstract void OpenUI();
     public abstract void CloseUI();
