@@ -10,7 +10,7 @@ public enum StatChangeType
     Override,
 
 }
-public enum StatType : int
+public enum StatTypes : int
 {
     MaxHealth,
     MoveSpeed,
@@ -20,9 +20,8 @@ public enum StatType : int
     Power,
     Level,
     Exp,
-    Name,
-
 }
+
 
 [Serializable]
 public class CharacterStats
@@ -39,5 +38,23 @@ public class CharacterStats
         stats.MoveSpeed = MoveSpeed;
         stats.AttackInfo = null;
         return stats;
+    }
+    public static string StatToString(StatTypes statType)
+    {
+        switch (statType)
+        {
+            case StatTypes.MaxHealth:
+                return "최대 체력";
+            case StatTypes.MoveSpeed:
+                return "이동속도";
+            case StatTypes.AttackSize:
+                return "공격범위";
+            case StatTypes.Delay:
+                return "공격속도";
+            case StatTypes.Power:
+                return "공격력";
+            default:
+                return "";
+        }
     }
 }

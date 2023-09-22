@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Burst;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class CharacterStatHandler : MonoBehaviour
 {
-    [SerializeField] private CharacterStats baseStats;
+    [SerializeField] protected CharacterStats BaseStats;
     public CharacterStats CurrentCharacterStats { get; protected set; }
     private List<StatModifier> _statsModifiers = new List<StatModifier>();
 
@@ -21,6 +20,10 @@ public class CharacterStatHandler : MonoBehaviour
     {
         InitializeCharacterStats();
     }
+    private void Start()
+    {
+        UpdateCharacterStats();
+    }
     public void AddStatModifier(StatModifier statModifier)
     {
         _statsModifiers.Add(statModifier);
@@ -31,15 +34,15 @@ public class CharacterStatHandler : MonoBehaviour
         _statsModifiers.Remove(statModifier);
         UpdateCharacterStats();
     }
-    protected virtual void InitializeCharacterStats()
+    protected void InitializeCharacterStats()
     {
         AttackSO attackInfo = null;
-        if (baseStats.AttackInfo != null)
+        if (BaseStats.AttackInfo != null)
         {
-            attackInfo = Instantiate(baseStats.AttackInfo);
+            attackInfo = Instantiate(BaseStats.AttackInfo);
         }
 
-        CurrentCharacterStats = baseStats.Clone();
+        CurrentCharacterStats = BaseStats.Clone();
         CurrentCharacterStats.AttackInfo = attackInfo;
     }
     protected void UpdateCharacterStats()
@@ -62,14 +65,14 @@ public class CharacterStatHandler : MonoBehaviour
 
         LimitAllStats();
     }
-    protected virtual void UpdateStats(StatType statType, float value, Func<float, float, float> operation)
+    protected virtual void UpdateStats(StatTypes statType, float value, Func<float, float, float> operation)
     {
         switch (statType)
         {
-            case StatType.MaxHealth:
+            case StatTypes.MaxHealth:
                 CurrentCharacterStats.MaxHealth = (int)operation(CurrentCharacterStats.MaxHealth, value);
                 break;
-            case StatType.MoveSpeed:
+            case StatTypes.MoveSpeed:
                 CurrentCharacterStats.MoveSpeed = operation(CurrentCharacterStats.MoveSpeed, value);
                 break;
         }
@@ -77,13 +80,13 @@ public class CharacterStatHandler : MonoBehaviour
             return;
         switch (statType)
         {
-            case StatType.AttackSize:
+            case StatTypes.AttackSize:
                 CurrentCharacterStats.AttackInfo.AttackSize = operation(CurrentCharacterStats.AttackInfo.AttackSize, value);
                 break;
-            case StatType.Delay:
+            case StatTypes.Delay:
                 CurrentCharacterStats.AttackInfo.Delay = operation(CurrentCharacterStats.AttackInfo.Delay, value);
                 break;
-            case StatType.Power:
+            case StatTypes.Power:
                 CurrentCharacterStats.AttackInfo.Power = operation(CurrentCharacterStats.AttackInfo.Power, value);
                 break;
         }
@@ -107,5 +110,29 @@ public class CharacterStatHandler : MonoBehaviour
         CurrentCharacterStats.AttackInfo.AttackSize = Mathf.Max(CurrentCharacterStats.AttackInfo.AttackSize, MinAttackSize);
         CurrentCharacterStats.AttackInfo.Delay = Mathf.Max(CurrentCharacterStats.AttackInfo.Delay, MinAttackDelay);
         CurrentCharacterStats.AttackInfo.Power = Mathf.Max(CurrentCharacterStats.AttackInfo.Power, MinAttackPower);
+    }
+    public virtual float GetCurrentStatValue(StatTypes statType)
+    {
+        switch (statType)
+        {
+            case StatTypes.MaxHealth:
+                return CurrentCharacterStats.MaxHealth;
+            case StatTypes.MoveSpeed:
+                return CurrentCharacterStats.MoveSpeed;
+        }
+
+        if (CurrentCharacterStats == null)
+            return 0;
+
+        switch (statType)
+        {
+            case StatTypes.AttackSize:
+                return CurrentCharacterStats.AttackInfo.AttackSize;
+            case StatTypes.Delay:
+                return CurrentCharacterStats.AttackInfo.Delay;
+            case StatTypes.Power:
+                return CurrentCharacterStats.AttackInfo.Power;
+        }
+        return 0;
     }
 }

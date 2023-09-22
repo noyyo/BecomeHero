@@ -1,53 +1,48 @@
 ﻿using System;
+using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 
-public class PlayerStatsHandler : CharacterStatHandler
+public class PlayerStatHandler : CharacterStatHandler
 {
-    
+    [SerializeField] private PlayerStats _playerStats;
+    private const int MaxNameLength = 6;
     private const int MinLevel = 1;
     private const int MaxLevel = 100;
     private const int MinExp = 0;
     private const int MaxExp = 100000;
+    public int ExpForLevelUp
+    {
+        get
+        {
+            return Mathf.RoundToInt(Mathf.Pow(100, _playerStats.Level));
+        }
+    }
 
     private void Awake()
     {
         InitializeCharacterStats();
     }
-    protected override void InitializeCharacterStats()
+    private void Start()
     {
-        PlayerStats playerStats = new PlayerStats();
-
-        AttackSO attackInfo = null;
-        if (baseStats == null)
-        {
-            Debug.Log("오");
-        }
-        if (baseStats.AttackInfo != null)
-        {
-            attackInfo = Instantiate(baseStats.AttackInfo);
-        }
-
-        CurrentCharacterStats = baseStats.Clone();
-        CurrentCharacterStats.AttackInfo = attackInfo;
+        UpdateCharacterStats();
     }
-    protected override void UpdateStats(StatType statType, float value, Func<float, float, float> operation)
+    protected override void UpdateStats(StatTypes statType, float value, Func<float, float, float> operation)
     {
         base.UpdateStats(statType, value, operation);
 
-        if (!(CurrentCharacterStats is PlayerStats))
-        {
-            return;
-        }
-
-        PlayerStats playerStats = (PlayerStats)CurrentCharacterStats;
-
         switch (statType)
         {
-            case StatType.Level:
-                playerStats.Level = Mathf.RoundToInt(operation(playerStats.Level, value));
+            case StatTypes.Level:
+                _playerStats.Level = Mathf.RoundToInt(operation(_playerStats.Level, value));
                 break;
-            case StatType.Exp:
-                playerStats.Exp = Mathf.RoundToInt(operation(playerStats.Exp, value));
+            case StatTypes.Exp:
+                _playerStats.Exp = Mathf.RoundToInt(operation(_playerStats.Exp, value));
+                while (_playerStats.Exp > ExpForLevelUp)
+                {
+                    // watch out order
+                    _playerStats.Exp -= ExpForLevelUp;
+                    _playerStats.Level++;
+                }
                 break;
         }
     }
@@ -55,15 +50,34 @@ public class PlayerStatsHandler : CharacterStatHandler
     protected override void LimitAllStats()
     {
         base.LimitAllStats();
+        _playerStats.Level = Mathf.Clamp(_playerStats.Level, MinLevel, MaxLevel);
+        _playerStats.Exp = Mathf.Clamp(_playerStats.Level, MinExp, MaxExp);
+    }
 
-        if (!(CurrentCharacterStats is PlayerStats))
+    public void SetName(string name)
+    {
+        if (name.Length > MaxNameLength)
+            _playerStats.Name = name.Substring(0, MaxNameLength);
+    }
+    public string GetName()
+    {
+        return _playerStats.Name;
+    }
+    public PlayerStats GetPlayerStats()
+    {
+        return _playerStats;
+    }
+
+    public override float GetCurrentStatValue(StatTypes statType)
+    {
+        switch (statType)
         {
-            return;
+            case StatTypes.Level:
+                return _playerStats.Level;
+            case StatTypes.Exp:
+                return _playerStats.Exp;
         }
 
-        PlayerStats playerStats = (PlayerStats)CurrentCharacterStats;
-        playerStats.Level = Mathf.Clamp(playerStats.Level, MinLevel, MaxLevel);
-        playerStats.Exp = Mathf.Clamp(playerStats.Level, MinExp, MaxExp);
-
+        return base.GetCurrentStatValue(statType);
     }
 }

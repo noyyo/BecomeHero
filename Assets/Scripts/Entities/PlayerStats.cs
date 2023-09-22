@@ -2,9 +2,9 @@
 using UnityEngine;
 
 [Serializable]
-public class PlayerStats : CharacterStats
+public class PlayerStats
 {
-    [SerializeField] public string name;
-    [SerializeField] [Range(1, 100)] public int Level;
-    [SerializeField] [Range(0, 100000)] public int Exp;
+    public string Name;
+    [Range(1, 100)] public int Level;
+    [Range(0, 100000)] public int Exp;
 }
