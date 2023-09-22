@@ -1,2 +1,2 @@
-# BecomeHero
-UnityPracticeProject
+# BecomeHero - 윤지석
+스파르타 던전을 구현하고 있으며 현재 수정중에 있습니다.
